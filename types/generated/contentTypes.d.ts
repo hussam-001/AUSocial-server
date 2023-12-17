@@ -362,120 +362,6 @@ export interface AdminTransferTokenPermission extends Schema.CollectionType {
   };
 }
 
-export interface ApiCommentComment extends Schema.CollectionType {
-  collectionName: 'comments';
-  info: {
-    singularName: 'comment';
-    pluralName: 'comments';
-    displayName: 'Comment';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    content: Attribute.String & Attribute.Required;
-    user: Attribute.Relation<
-      'api::comment.comment',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    post: Attribute.Relation<
-      'api::comment.comment',
-      'manyToOne',
-      'api::post.post'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::comment.comment',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::comment.comment',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiPostPost extends Schema.CollectionType {
-  collectionName: 'posts';
-  info: {
-    singularName: 'post';
-    pluralName: 'posts';
-    displayName: 'Post';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    user: Attribute.Relation<
-      'api::post.post',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    content: Attribute.RichText;
-    images: Attribute.Media;
-    comments: Attribute.Relation<
-      'api::post.post',
-      'oneToMany',
-      'api::comment.comment'
-    >;
-    reactions: Attribute.Relation<
-      'api::post.post',
-      'oneToMany',
-      'api::reaction.reaction'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<'api::post.post', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<'api::post.post', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-  };
-}
-
-export interface ApiReactionReaction extends Schema.CollectionType {
-  collectionName: 'reactions';
-  info: {
-    singularName: 'reaction';
-    pluralName: 'reactions';
-    displayName: 'Reaction';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    post: Attribute.Relation<
-      'api::reaction.reaction',
-      'manyToOne',
-      'api::post.post'
-    >;
-    user: Attribute.Relation<
-      'api::reaction.reaction',
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::reaction.reaction',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::reaction.reaction',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
 export interface PluginUploadFile extends Schema.CollectionType {
   collectionName: 'files';
   info: {
@@ -589,6 +475,50 @@ export interface PluginUploadFolder extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'plugin::upload.folder',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface PluginI18NLocale extends Schema.CollectionType {
+  collectionName: 'i18n_locale';
+  info: {
+    singularName: 'locale';
+    pluralName: 'locales';
+    collectionName: 'locales';
+    displayName: 'Locale';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: false;
+    };
+    'content-type-builder': {
+      visible: false;
+    };
+  };
+  attributes: {
+    name: Attribute.String &
+      Attribute.SetMinMax<{
+        min: 1;
+        max: 50;
+      }>;
+    code: Attribute.String & Attribute.Unique;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'plugin::i18n.locale',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'plugin::i18n.locale',
       'oneToOne',
       'admin::user'
     > &
@@ -731,11 +661,8 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     >;
     firstName: Attribute.String & Attribute.Required;
     lastName: Attribute.String & Attribute.Required;
-    posts: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToMany',
-      'api::post.post'
-    >;
+    verified: Attribute.Boolean & Attribute.DefaultTo<false>;
+    avatar: Attribute.Media;
     comments: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
@@ -746,7 +673,21 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::reaction.reaction'
     >;
-    verified: Attribute.Boolean & Attribute.DefaultTo<false>;
+    posts: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::post.post'
+    >;
+    followings: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::follow.follow'
+    >;
+    followers: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::follow.follow'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -764,43 +705,155 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
 }
 
-export interface PluginI18NLocale extends Schema.CollectionType {
-  collectionName: 'i18n_locale';
+export interface ApiCommentComment extends Schema.CollectionType {
+  collectionName: 'comments';
   info: {
-    singularName: 'locale';
-    pluralName: 'locales';
-    collectionName: 'locales';
-    displayName: 'Locale';
+    singularName: 'comment';
+    pluralName: 'comments';
+    displayName: 'Comment';
     description: '';
   };
   options: {
     draftAndPublish: false;
   };
-  pluginOptions: {
-    'content-manager': {
-      visible: false;
-    };
-    'content-type-builder': {
-      visible: false;
-    };
-  };
   attributes: {
-    name: Attribute.String &
-      Attribute.SetMinMax<{
-        min: 1;
-        max: 50;
-      }>;
-    code: Attribute.String & Attribute.Unique;
+    content: Attribute.String & Attribute.Required;
+    commentedBy: Attribute.Relation<
+      'api::comment.comment',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    post: Attribute.Relation<
+      'api::comment.comment',
+      'manyToOne',
+      'api::post.post'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
-      'plugin::i18n.locale',
+      'api::comment.comment',
       'oneToOne',
       'admin::user'
     > &
       Attribute.Private;
     updatedBy: Attribute.Relation<
-      'plugin::i18n.locale',
+      'api::comment.comment',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiFollowFollow extends Schema.CollectionType {
+  collectionName: 'follows';
+  info: {
+    singularName: 'follow';
+    pluralName: 'follows';
+    displayName: 'Follow';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    follower: Attribute.Relation<
+      'api::follow.follow',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    following: Attribute.Relation<
+      'api::follow.follow',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::follow.follow',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::follow.follow',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiPostPost extends Schema.CollectionType {
+  collectionName: 'posts';
+  info: {
+    singularName: 'post';
+    pluralName: 'posts';
+    displayName: 'Post';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    postedBy: Attribute.Relation<
+      'api::post.post',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    content: Attribute.RichText;
+    images: Attribute.Media;
+    comments: Attribute.Relation<
+      'api::post.post',
+      'oneToMany',
+      'api::comment.comment'
+    >;
+    reactions: Attribute.Relation<
+      'api::post.post',
+      'oneToMany',
+      'api::reaction.reaction'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::post.post', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::post.post', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiReactionReaction extends Schema.CollectionType {
+  collectionName: 'reactions';
+  info: {
+    singularName: 'reaction';
+    pluralName: 'reactions';
+    displayName: 'Reaction';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    post: Attribute.Relation<
+      'api::reaction.reaction',
+      'manyToOne',
+      'api::post.post'
+    >;
+    reactedBy: Attribute.Relation<
+      'api::reaction.reaction',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::reaction.reaction',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::reaction.reaction',
       'oneToOne',
       'admin::user'
     > &
@@ -818,15 +871,16 @@ declare module '@strapi/types' {
       'admin::api-token-permission': AdminApiTokenPermission;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
-      'api::comment.comment': ApiCommentComment;
-      'api::post.post': ApiPostPost;
-      'api::reaction.reaction': ApiReactionReaction;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
+      'plugin::i18n.locale': PluginI18NLocale;
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
-      'plugin::i18n.locale': PluginI18NLocale;
+      'api::comment.comment': ApiCommentComment;
+      'api::follow.follow': ApiFollowFollow;
+      'api::post.post': ApiPostPost;
+      'api::reaction.reaction': ApiReactionReaction;
     }
   }
 }

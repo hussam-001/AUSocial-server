@@ -4,7 +4,8 @@
   "info": {
     "singularName": "reaction",
     "pluralName": "reactions",
-    "displayName": "Reaction"
+    "displayName": "Reaction",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -17,7 +18,7 @@
       "target": "api::post.post",
       "inversedBy": "reactions"
     },
-    "user": {
+    "reactedBy": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",

@@ -1,10 +1,10 @@
 {
   "kind": "collectionType",
-  "collectionName": "comments",
+  "collectionName": "follows",
   "info": {
-    "singularName": "comment",
-    "pluralName": "comments",
-    "displayName": "Comment",
+    "singularName": "follow",
+    "pluralName": "follows",
+    "displayName": "Follow",
     "description": ""
   },
   "options": {
@@ -12,21 +12,17 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "content": {
-      "type": "string",
-      "required": true
-    },
-    "commentedBy": {
+    "follower": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "comments"
+      "inversedBy": "followings"
     },
-    "post": {
+    "following": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::post.post",
-      "inversedBy": "comments"
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "followers"
     }
   }
 }

@@ -73,27 +73,46 @@
       "type": "string",
       "required": true
     },
-    "posts": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::post.post",
-      "mappedBy": "user"
+    "verified": {
+      "type": "boolean",
+      "default": false
+    },
+    "avatar": {
+      "allowedTypes": [
+        "images"
+      ],
+      "type": "media",
+      "multiple": false
     },
     "comments": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::comment.comment",
-      "mappedBy": "user"
+      "mappedBy": "commentedBy"
     },
     "reactions": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::reaction.reaction",
-      "mappedBy": "user"
+      "mappedBy": "reactedBy"
     },
-    "verified": {
-      "type": "boolean",
-      "default": false
+    "posts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::post.post",
+      "mappedBy": "postedBy"
+    },
+    "followings": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::follow.follow",
+      "mappedBy": "follower"
+    },
+    "followers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::follow.follow",
+      "mappedBy": "following"
     }
   }
 }
