@@ -41,10 +41,10 @@ module.exports = createCoreController("api::post.post", {
     return data;
   },
   async delete(ctx) {
-    const { id } = ctx.params;
+    const id = Number(ctx.params.id);
     const { user } = ctx.state;
     const postData = await this.findOne(ctx);
-    if (postData.user.id !== user.id) {
+    if (postData.postedBy.id !== user.id) {
       return ctx.unauthorized("You can't delete this post");
     }
     return strapi.service("api::post.post").delete(id);
